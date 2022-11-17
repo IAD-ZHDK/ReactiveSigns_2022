@@ -1,15 +1,19 @@
 let oscSignal = false;// osc signal
+let fullscreenMode = false;
 // helper variables for scalable positioning
 const screens = [{x:0, y:0, w:100, h:100, cntX: 50, cntY: 50}, {x:0, y:0, w:100, h:100, cntX: 50, cntY: 50}]
+let fpsAverage = 0;
 let vw = 1; // 1 percent of viewport width;
 let vh = 1; // 1 percent of viewport height;
 /*  aspect ratio control */
 
-const pageWidth = 2160 * screens.length; //  
-const pageHeight = 3840; // 
+const pageWidth = 1080 * screens.length; // resolution 
+const pageHeight = 1920; //
 
 
 function correctAspectRatio() {
+  let offsetX = 0;
+  let offsetY = 0;
   if (_renderer.drawingContext instanceof WebGLRenderingContext) {
     offsetX = - Math.floor(width/2)
     offsetY = - Math.floor(height/2)
@@ -23,6 +27,9 @@ function correctAspectRatio() {
     screens[i].cntY = screens[i].h/2; 
   }
   // 
+//
+
+  // 
   vw = width*0.01; // 1 percent of viewport width;
   vh = height*0.01;// 1 percent of viewport height;  
 }
@@ -31,31 +38,42 @@ function correctAspectRatio() {
 function getWindowWidth() {
   let aspectRatioWH = pageWidth/pageHeight; // width to height
   let aspectRatioHW = pageHeight/pageWidth; // height to width
-  let currentRatio = windowWidth/windowHeight;
 
-  if (windowWidth < windowHeight*aspectRatioWH) {
+  let currentRatio = window.innerWidth/window.innerHeight;
+
+  if (window.innerWidth < window.innerHeight*aspectRatioWH) {
     // for portrait mode
-    posterWidth = windowWidth;
+    posterWidth = window.innerWidth;
   } else {
     // for landscape mode
-    posterWidth = floor(windowHeight*aspectRatioWH);
+    posterWidth = Math.floor(window.innerHeight*aspectRatioWH);
   }
-
   return posterWidth;
 }
 
 function getWindowHeight() {
+  
   let aspectRatioWH = pageWidth/pageHeight; // width to height
   let aspectRatioHW = pageHeight/pageWidth; // height to width
-  if (windowWidth < windowHeight*aspectRatioWH) {
+  if (window.innerWidth < window.innerHeight*aspectRatioWH) {
     // for portrait mode
-    posterHeight = floor(windowWidth*aspectRatioHW);
+    posterHeight = Math.floor(window.innerWidth*aspectRatioHW);
   } else {
     // for landscape mode
-    
-    posterHeight = windowHeight;
+    posterHeight = window.innerHeight;
   }
+  //console.log("windowWidth = "+window.innerWidth+" displaywidth = "+displayWidth);
+  //console.log("windowHeight = "+window.innerHeight+" displayHeight = "+displayHeight);
+
+  if (window.innerHeight == screen.height) {
+    fullscreenMode = true;
+  } else {
+    fullscreenMode = false;
+  }
+  //console.log(_renderer._curCamera);
+  console.log("fullscreenMode = "+fullscreenMode);
   return posterHeight;
+  
 }
 
 document.addEventListener('fullscreenchange', (event) => {
@@ -64,78 +82,119 @@ document.addEventListener('fullscreenchange', (event) => {
   // the value of the property is null.
   if (document.fullscreenElement) {
     console.log(`Element: ${document.fullscreenElement.id} entered full-screen mode.`);
+    fullscreenMode = true;
     resized();  
   } else {
     console.log('Leaving full-screen mode.');
+    fullscreenMode = false;
     resized();  
   }
 });
 
 function resized() {
+  cameraSave(); // work around for play.js
   resizeCanvas(getWindowWidth(), getWindowHeight());
+  cameraRestore(); // work around for play.js
   correctAspectRatio();
   try {
     windowScaled();
   }   catch(e) {
   }
 }
+
 window.onresize = resized;
 
 
+let percentX;
+let percentY;
+function cameraSave(){
+  try {
+    percentX = camera.position.x/width;
+    percentY = camera.position.y/height;
+  }   catch(e) {
+  }
+
+}
+
+function cameraRestore(){
+  try {
+    camera.position.x = percentX * width;
+    camera.position.y = percentY * height;
+  }   catch(e) {
+  }
+}
+
 function mousePressed() {
   if (mouseButton === LEFT) {
-    this.openFullscreen();
+   this.openFullscreen();
+  }
+}
+
+function keyPressed() {
+  try {
+    parent.pickPoster(key)
+  }   catch(e) {
   }
 }
 
 function showPoint(pos) {
   push();
+  if (_renderer.drawingContext instanceof WebGLRenderingContext) {
+    translate(-width/2,-height/2,0);
+  }
   fill(0, 180, 180);
   noStroke();
   circle(pos.x, pos.y, pos.z*10);
   pop();
 }
 
-function screenchange() {
-  if (document.fullscreenElement) {
-    console.log('Entering full-screen mode.');
-  } else {
-    console.log('Leaving full-screen mode.');
-  }
-}
-
-let fpsAverage = 0;
-
 function posterTasks() {
+  
   if (millis()-lastOSC>=2000) {
      // if there is no osc connection, then use mouse for position
-     updatePosition(mouseX/width,mouseY/height,1.0)
-     oscSignal = false;
+    updatePosition(mouseX/width,mouseY/height,1.0)
+    oscSignal = false;
   } else {
     oscSignal = true;
   }
-  mouseOverC = false;
-  // show helplines when outside of fullscreenmode
-  if (!fullscreen()) {
-    push();
-    fill(0, 180, 180);
-    noStroke();
-    fpsAverage = fpsAverage * 0.9;
-    fpsAverage += frameRate() * 0.1;
-    textSize(0.8*vw);
-    textAlign(LEFT, TOP);
-    text("fps: "+Math.floor(fpsAverage), width*0.02, height*0.04);
-    text("Streaming: "+oscSignal, width*0.02, height*0.07);
-    text("tracking: "+tracking, width*0.02, height*0.010);
-    
-    noFill();
-    stroke(0, 180, 180);
-    rectMode(CORNER);
-    rect(0, 0, width, height);
-    line(width/2, 0, width/2, height); // line between 1st and 2nd screen
-    pop();
-    showPoint(position);
-}
+  
+  try {
+    window.parent.trackingCallback(tracking, oscSignal);
+  }   catch(e) {
+  }
+
+
+  // show helplines when outside of fullscreen mode
+  //(window.innerWidth == screen.width && window.innerHeight == screen.height)
+  let debug = true;
+  if (!fullscreenMode && debug) {
+
+      push();
+      if (_renderer.drawingContext instanceof WebGLRenderingContext) {
+        translate(-width/2,-height/2,0);
+      }
+      fill(0, 180, 180);
+      noStroke();
+      fpsAverage = fpsAverage * 0.9;
+      fpsAverage += frameRate() * 0.1;
+      textSize(1.2*vw);
+      textAlign(LEFT, TOP);
+      text("fps: "+Math.floor(fpsAverage), screens[0].x+vw, screens[0].y+vh);
+      text("Streaming: "+oscSignal, screens[0].x+vw, screens[0].y+vh+vh+vh);
+      text("tracking: "+tracking, screens[0].x+vw, screens[0].y+vh+vh+vh+vh+vh);
+      noFill();
+      stroke(0, 180, 180);  
+      rectMode(CORNER);
+      rect(screens[0].x, screens[0].y, width, height);
+      // line between screens
+      for (let i = 1; i<screens.length; i++) {
+        screens[i].w = floor(width/screens.length);
+        line(screens[i].x, screens[i].y, screens[i].x, screens[i].y+screens[i].h); // line between 1st and 2nd screen
+      }
+
+      pop();
+      showPoint(position);
+  }
 }
 
 function openFullscreen () {
