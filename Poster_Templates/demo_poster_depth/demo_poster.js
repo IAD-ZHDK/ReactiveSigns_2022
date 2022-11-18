@@ -13,7 +13,7 @@ function draw() {
   background(0);
   lineEffect()
   //pixelEffect()
-  //circle(width-position.x,position.y,100);
+
   ///////////////
   posterTasks(); // do not remove this last line!  
 }
@@ -27,7 +27,8 @@ function pixelEffect() {
   for (let i = 0; i<depthH; i+=2) {
     for (let j = 0; j<depthW; j+=2) {
       let index = (i*depthW)+j;
-      if (dataFiltered[index] > 0.0) {
+        if (dataFiltered[index] > 0.0) {
+        fill(int(dataFiltered[index]))
         rect(spaceX*j, spaceY*i, 5, 5);
       }
     }
@@ -46,9 +47,9 @@ function lineEffect() {
   noFill();
 	// loop through all the pixels in the depth image
   translate(-vw*3,0)
-  for (let y = 0; y<depthH; y+=4) {
+  for (let y = 0; y<depthH; y+=3) {
 		beginShape();
-		for (let x = 0; x < depthW; x+=4) {
+		for (let x = 0; x < depthW; x+=3) {
       let index = (y*depthW)+x;
 			let h = dataFiltered[index]*vh*0.05; 
 			curveVertex(x*spaceX, (y*spaceY)-h);

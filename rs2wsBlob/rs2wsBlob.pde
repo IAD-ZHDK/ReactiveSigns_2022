@@ -330,7 +330,6 @@ void drawCamara() {
 
   // recording
   if (recording) {
-    //savePath()
     depth.save("data/recordings/outputImage"+recordingCount+".jpg");
     recordingCount++;
   }
@@ -381,13 +380,11 @@ void findPositions(PImage depthImage) {
         stroke(255, 0, 0);
         rect(rx, ry, rw, rh);
         text("ID: "+i, rx+10, ry+10);
-        //fill(30, 100, 100);
         //blob center
         // single point
         float x = rx + rw/2;
         float y = ry + rh/2;
         float z = (rw / r.width); // somewhat arbitrary division
-        // circle(x, y, z);
         pop();
         // normalize all values
         x = x / depthImage.width;

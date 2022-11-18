@@ -83,24 +83,24 @@ function updateDepthImage(msg) {
   updatePosition(msg.args[3],msg.args[4],msg.args[5]);
   // depth data
   tracking = boolean(msg.args[6]);
-  if (enableDepthStream) {
-    depthW = msg.args[0];
-    depthH = msg.args[1];
-    data = msg.args[2];
-    data = msg.args[2];
+    if (enableDepthStream) {
+      depthW = msg.args[0];
+      depthH = msg.args[1];
+      data = msg.args[2];
+      data = msg.args[2];
 
   /* weighted moving average on every point*/
-  try {
-    let depthLength = depthW * depthH;
-    for (let i = 0; i < depthLength; i++) {
-      //let index = (i*w)+j;
-       dataFiltered[i] = int(dataFiltered[i]*0.9);
-       dataFiltered[i] += int(data[i]*0.1);
+    try {
+      let depthLength = depthW * depthH;
+      for (let i = 0; i < depthLength; i++) {
+        //let index = (i*w)+j;
+        dataFiltered[i] = int(dataFiltered[i]*0.9);
+        dataFiltered[i] += int(data[i]*0.1);
+      }
+    } catch(e) {
+      console.log("data not defined yet");
+      dataFiltered = Array.from(msg.args[2]);
     }
-  } catch(e) {
-    console.log("data not defined yet");
-    dataFiltered = Array.from(msg.args[2]);
-  }
   }
   //
   // uncomment to recreate image

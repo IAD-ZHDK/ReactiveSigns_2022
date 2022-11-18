@@ -154,6 +154,30 @@ function posterTasks() {
      // if there is no osc connection, then use mouse for position
     updatePosition(mouseX/width,mouseY/height,1.0)
     oscSignal = false;
+    if (enableDepthStream) {
+              // placeholder patern
+      try {
+        depthH = 140 ;
+        depthW = 160 ;
+        let depthLength = depthH * depthW;
+        let reactorX = depthW/2 + sin(frameCount*0.015)*depthW*0.3;
+        let reactorY = depthH/2 + cos(frameCount*0.015)*depthH*0.2;
+     //   centerPoint.add(depthW/2,height/2)
+        for (let i = 0; i < depthLength; i++) {
+          let x = i%depthW;
+          let y = i/depthW;
+          let dis = dist(x,y,reactorX,reactorY);
+          let scaler = bellCurve(dis, 255, 10);
+          scale = constrain(scale,0,255)
+          dataFiltered[i] = scaler;
+        }
+      } catch(e) {
+        console.log("data not defined yet");
+        dataFiltered = [];
+      }
+
+    }
+  
   } else {
     oscSignal = true;
   }
@@ -196,6 +220,15 @@ function posterTasks() {
       showPoint(position);
   }
 }
+
+function bellCurve(t, b, c) {
+  // see https://en.wikipedia.org/wiki/Gaussian_function
+    // t = time
+    // b = amplitude
+    // c = wavelength 
+    var scaler = 1+(c/sqrt((c*c)+(t*t)))*b; //bell curve
+    return scaler;
+  }
 
 function openFullscreen () {
   let elem = document.documentElement
