@@ -2,18 +2,18 @@
 //
 //There are three screens (screen1, screen2, screen3), for which you can access the coordinates with the following variables. width/2 and height/2 can still be used in reference to the combined screen layout. 
 //
-//screen1.x : x position of 1st screen
-//screen1.y : y position of 1st screen. Tip: this will always be 0! 
-//screen1.w : width of 1st screen
-//screen1.h : height of 1st screen
-//screen1.cntX : x position of screen center
-//screen1.cntY : y position of screen center
+//screen[0].x : x position of 1st screen
+//screen[0].y : y position of 1st screen. Tip: this will always be 0! 
+//screen[0].w : width of 1st screen
+//screen[0].h : height of 1st screen
+//screen[0].cntX : x position of screen center
+//screen[0].cntY : y position of screen center
 
 //
 // These variables act as units of measurement, which are safer than using pixel coordinates. 
 //
-//vw : 1 percent of viewport width
-//vh : 1  percent of viewport height
+// vw : 1 percent of viewport width
+// vh : 1  percent of viewport height
 
 //
 // These variables hold the coordinates of a tracker point, based on the camera and blob detection. When no camera is available the information will be replaced by the mouse.
@@ -33,6 +33,7 @@ function preload() {
 function setup() {
   createCanvas(getWindowWidth(), getWindowHeight()); // impartant! Don't modify this line. 
   setupOSC(false);  // impartant! Don't remove this line. The boolean argument turns the depthstream on and off
+ 
   textFont(font);
   textAlign(CENTER,CENTER);
   textSize(10*vw);
