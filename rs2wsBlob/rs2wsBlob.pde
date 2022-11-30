@@ -316,7 +316,7 @@ void drawCamara() {
   rect(0, 0, width, 130);
   fill(255);
   textSize(15);
-  text("Image Size: " + depth.width + " x " + depth.height, 30, 30);
+  text("Image Size: " +depthCrop.width + " x " + depthCrop.height, 30, 30);
   text("Serving: ws://localhost:" + PORT + "/", 30, 60);
   text("trackingAtive: " + trackingAtive + "", 30, 90);
   text("cameraFlip: " + cameraFlip + "", 30, 120);
@@ -421,7 +421,7 @@ void findPositions(PImage depthImage) {
          indexOrder[i] = closestIndex;
        }
  
-      // TODO: THREE IS A PROBLEM REMOVING POINTS TO THE RIGHT INDEX.
+      // TODO: THERE IS A PROBLEM REMOVING POINTS TO THE RIGHT INDEX.
       
       if (multiPointAveraged.size() > multiPointTemp.size()) {
         int lengthDifference = multiPointAveraged.size()-multiPointTemp.size();
@@ -436,7 +436,7 @@ void findPositions(PImage depthImage) {
       //
       //
       // average single points 
-      // TODO: THREE IS A PROBLEM ADDING  POINTS TO THE RIGHT INDEX. 
+      // TODO: THERE IS A PROBLEM ADDING  POINTS TO THE RIGHT INDEX. 
       int existingPoints = multiPointAveraged.size();
       for (int i = 0; i<multiPointTemp.size(); i++) {
         PVector temp2 = multiPointTemp.get(i);   
