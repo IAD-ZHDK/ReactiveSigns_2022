@@ -39,7 +39,7 @@ function setup() {
 }
 
 function draw() {
-  background(255,0,0,30);
+  background(0,0,0,30);
 	fill(255);
   wordEffect("FUTURE", screens[0].cntX, screens[0].cntY);
   wordEffect("NOW", screens[1].cntX, screens[1].cntY);

@@ -22,9 +22,9 @@ function draw() {
   image(images[i],screens[0].x,0,screens[0].w,screens[0].h);   
   image(images[i],screens[1].x,0,screens[1].w,screens[1].h);
   fill(255,0,0);
-  circle(position.x,position.y,position.z*10);
-  line(position.x,position.y,newVectorNormal.x*width,newVectorNormal.y*height)
-  circle(newVectorNormal.x*width,newVectorNormal.y*height,5);
+  //circle(position.x,position.y,position.z*10);
+  //line(position.x,position.y,newVectorNormal.x*width,newVectorNormal.y*height)
+  //circle(newVectorNormal.x*width,newVectorNormal.y*height,5);
   ///////////////
   posterTasks(); // do not remove this last line!  
 }
@@ -47,15 +47,13 @@ let playBackFlag = false;
 // let velocityAverage = 0;
 
 function getSmoothPlayBackVector(vector) {
-
+// This function attempts to make the animation look smoother, when the controller is moving very slowly. 
   if (typeof DragVector === 'undefined') {
     DragVector = createVector(0,0);
     lastVector = createVector(0,0);
   }
  
       let velocity = abs(lastVector.x-vector.x);
-     // velocityAverage = velocityAverage*0.95
-     // velocityAverage += velocity*0.05
        let difference = abs(DragVector.x-vector.x);
 
         let delta = map(velocity,1.8,15.0,1.0,0.75, true);
