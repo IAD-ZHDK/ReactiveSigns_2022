@@ -11,6 +11,11 @@ function preload() {
 function setup() {
   createCanvas(getWindowWidth(), getWindowHeight()); // impartant! Don't modify this line. 
   setupOSC(false); // impartant! Don't modify this line. 
+  for(let i=0;i<imagCount;i++) {
+    //make all images grey 
+    images[i].filter(GRAY);
+  }
+   
 }
 
 function draw() {
