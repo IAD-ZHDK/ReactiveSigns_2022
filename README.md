@@ -1,5 +1,9 @@
 # Templates for Reactive Signs Module 2022
-Send RealSense data over web socket to p5js.
+Sends RealSense data over web socket from Processing to p5js.
+
+![Posters](/Raw/JT_Poster.gif?raw=true)  
+![Posters](/Raw/RC_DS_Gif_Animation.gif?raw=true)  
+
 
 *Realsense websockets based on work by Florian Bruggisser*
 
