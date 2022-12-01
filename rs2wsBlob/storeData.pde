@@ -46,14 +46,6 @@ public final class CSVDataStore {
     saveTable(table, "data/"+file);
   }
 
-  /*
-  float cropY =  0.3;// percent
-   float cropHeight =  0.5;// percent
-   float cropX =  0.05;// percent
-   float cropWidth = 0.9;// percent
-   //
-   */
-
   public void saveData() {
     // save a new entry into the csv file
 

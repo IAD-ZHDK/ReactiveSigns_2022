@@ -1,4 +1,4 @@
-// realsense 2 websocket
+// realsense 2 websocket //<>//
 // sends depth data from realsense to websockets
 // written 2021 by Florian Bruggisser
 // modified by Luke Franzke for the Reactive Signs Module, ZHdK
@@ -21,6 +21,9 @@ Range range;
 
 boolean demoAlowed = false;
 boolean editable = false;
+
+boolean streamDepth = true;
+boolean streamRGB = true;
 final int WIDTH = 640;
 final int HEIGHT = 480;
 final int DECIMATION = 4;
@@ -46,7 +49,7 @@ RSThresholdFilter thresholdFilter;
 //
 // camera params 
 //
-boolean cameraFlip = true ;
+boolean cameraFlip = false;
 float minDistance = 0.0f;
 float maxDistance = 10.0f;
 float lowDistance = minDistance;
@@ -54,6 +57,9 @@ float highDistance = maxDistance;
 float size = 0.5f;
 
 byte[] depthBuffer = null;
+byte[] rBuffer = null;
+byte[] gBuffer = null;
+byte[] bBuffer = null;
 boolean cameraRunning = false;
 long lastTrackingMillis = 0;
 boolean trackingAtive = false;
@@ -75,6 +81,7 @@ void setup() {
   setupCamera();
 
   opencv = new OpenCV(this, floor((WIDTH / DECIMATION)*cropWidth), floor((HEIGHT / DECIMATION) *cropHeight));  
+
   println("Sending data on: ws://localhost:" + PORT + "/");
   // GUI
   cp5 = new ControlP5(this);
@@ -98,6 +105,14 @@ void setup() {
     .setValue(false)
     .setMode(ControlP5.SWITCH)
     .setCaptionLabel("Allow Edits")
+    ;
+    // toggle for rgb stream
+   cp5.addToggle("streamRGB")
+    .setPosition(100, height-90)
+    .setSize(50, 20)
+    .setValue(false)
+    .setMode(ControlP5.SWITCH)
+    .setCaptionLabel("Stream RGB")
     ;
   // for demo without camera
   defualtFrame = createImage(WIDTH / DECIMATION, HEIGHT / DECIMATION, RGB);
@@ -135,6 +150,9 @@ boolean setupOSC() {
     ws = new WebsocketServer(this, PORT, "/");
     // setup buffer
     depthBuffer = new byte[WIDTH / DECIMATION * HEIGHT / DECIMATION];
+    rBuffer = new byte[WIDTH * HEIGHT ];
+    gBuffer = new byte[WIDTH * HEIGHT ];
+    bBuffer = new byte[WIDTH * HEIGHT ];
   }
 
   catch (Exception ex) {
@@ -154,7 +172,7 @@ boolean setupCamera() {
     camera.enableDepthStream(WIDTH, HEIGHT);
     camera.enableColorizer(ColorScheme.WhiteToBlack);
     camera.addDecimationFilter(DECIMATION);
-    //camera.enableColorStream(640, 480);
+    camera.enableColorStream(WIDTH, HEIGHT);
     // filters
     camera.addTemporalFilter();
     camera.addHoleFillingFilter();
@@ -257,10 +275,11 @@ void drawError() {
 }
 
 void drawCamara() {
-  background(55);
+  
   PImage depth = getDepthImage();
+  PImage rgbImage = camera.getColorImage();
   if (cameraFlip && !replaying) {
-    //
+    // depth image
     PGraphics g;
     g = createGraphics(depth.width, depth.height);
     g.beginDraw();
@@ -271,36 +290,29 @@ void drawCamara() {
     g.popMatrix();
     g.endDraw();
     depth = g.get();
+    //  rgb image
+    PGraphics rgb;
+    rgb = createGraphics(rgbImage.width, rgbImage.height);
+    rgb.beginDraw();
+    rgb.pushMatrix();
+    rgb.scale(1, -1);
+    rgb.translate(0, -rgb.height);
+    rgb.image(rgbImage, 0, 0);
+    rgb.popMatrix();
+    rgb.endDraw();
+    rgbImage = rgb.get();
   }
-  PImage depthCrop = depth.get(floor(depth.width*cropX), floor(depth.height*cropY), floor(depth.width*cropWidth), floor(depth.height*cropHeight));   
-  stroke(0, 255, 0);
-  image(depth, 0, 0, width, height); 
-  if (editable) {
-    stroke(0xff08a2cf);
-  } else {
-    stroke(0xff003652);
-  }
-  line(0, floor(height*cropY), width, floor(height*cropY));
-  line(0, floor(height*cropY)+floor(height*cropHeight), width, floor(height*cropY)+floor(height*cropHeight));
-  line(floor(width*cropX), 0, floor(width*cropX), height);
-  line(floor(width*cropX)+floor(width*cropWidth), 0, floor(width*cropX)+floor(width*cropWidth), height);
-  //
+  PImage depthCrop = depth.get(floor(depth.width*cropX), floor(depth.height*cropY), floor(depth.width*cropWidth), floor(depth.height*cropHeight));
+  PImage rgbCrop = rgbImage.get(floor(rgbImage.width*cropX), floor(rgbImage.height*cropY), floor(rgbImage.width*cropWidth), floor(rgbImage.height*cropHeight));
+  
+  rgbCrop.resize(rgbCrop.width/DECIMATION, rgbCrop.height/DECIMATION);
+  
+   displayInterface(depth, rgbCrop, depthCrop.width, depthCrop.height);
   // recording image for usage without camera
   //
-  // send image over websocket
   if (cameraRunning || replaying) {
     blobTracking(depthCrop);
     findPositions(depthCrop);
-    push();
-    translate(floor(width*cropX), floor(height*cropY));
-    fill(0xff08a2cf);
-    circle(singlePointAverage.x*depthCrop.width*DECIMATION, singlePointAverage.y*depthCrop.height*DECIMATION, singlePointAverage.z*10);
-    for (int i = 0; i<multiPointAveraged.size(); i++) {
-      PVector temp = multiPointAveraged.get(i);
-      fill(255, 100, 0);
-      circle(temp.x*depthCrop.width*DECIMATION, temp.y*depthCrop.height*DECIMATION, temp.z*10);
-    }
-    pop();
   } else {
     singlePointAverage.y = .5;
     singlePointAverage.x = sin(radians(frameCount))*0.3+0.5;
@@ -309,30 +321,15 @@ void drawCamara() {
     fill(0, 255, 0);
     circle(singlePointAverage.x*width, singlePointAverage.y*height, singlePointAverage.z);
   }
-  sendPImage(depthCrop, singlePointAverage, trackingAtive);
-  // display information
-  fill(55, 100);
-  noStroke();
-  rect(0, 0, width, 130);
-  fill(255);
-  textSize(15);
-  text("Image Size: " +depthCrop.width + " x " + depthCrop.height, 30, 30);
-  text("Serving: ws://localhost:" + PORT + "/", 30, 60);
-  text("trackingAtive: " + trackingAtive + "", 30, 90);
-  text("cameraFlip: " + cameraFlip + "", 30, 120);
-  surface.setTitle("Realsense 2 WebSocket - " + round(frameRate) + " FPS");
-  if (editable) {
-    fill(0xff08a2cf);
-    text("'a' + click to set top-left", 300, 30);
-    text("'s' + click to set btm-right", 300, 50);
-    text("restart required after edit", 300, 80);
-  }
 
+  sendPImage(depthCrop, rgbCrop, singlePointAverage, trackingAtive, "/depth");
   // recording
   if (recording) {
     depth.save("data/recordings/outputImage"+recordingCount+".jpg");
     recordingCount++;
   }
+  
+
 }
 
 PImage getDepthImage() {
@@ -405,24 +402,23 @@ void findPositions(PImage depthImage) {
       point.set(xAverage, yAverage, zAverage);
       filterRatio = 0.95;
 
-
       // find closest match from new blobs to average 
       int[] indexOrder = new int[multiPointTemp.size()];
-       for (int i = 0; i<multiPointTemp.size(); i++) {
+      for (int i = 0; i<multiPointTemp.size(); i++) {
         int closestIndex = 0;
         float shortestDist = width+height;
         for (int j = 0; j < multiPointAveraged.size(); j++) {
-         float distance =  multiPointTemp.get(i).dist(multiPointAveraged.get(j));
-         if (distance<shortestDist) {
-           shortestDist = distance;
-           closestIndex = j;
-         }
+          float distance =  multiPointTemp.get(i).dist(multiPointAveraged.get(j));
+          if (distance<shortestDist) {
+            shortestDist = distance;
+            closestIndex = j;
+          }
         }
-         indexOrder[i] = closestIndex;
-       }
- 
+        indexOrder[i] = closestIndex;
+      }
+
       // TODO: THERE IS A PROBLEM REMOVING POINTS TO THE RIGHT INDEX.
-      
+
       if (multiPointAveraged.size() > multiPointTemp.size()) {
         int lengthDifference = multiPointAveraged.size()-multiPointTemp.size();
         for (int i = 0; i < lengthDifference; i++) {
@@ -434,9 +430,7 @@ void findPositions(PImage depthImage) {
       Collections.sort(multiPointAveraged, new XComparator());
       Collections.sort(multiPointTemp, new XComparator());
       //
-      //
       // average single points 
-      // TODO: THERE IS A PROBLEM ADDING  POINTS TO THE RIGHT INDEX. 
       int existingPoints = multiPointAveraged.size();
       for (int i = 0; i<multiPointTemp.size(); i++) {
         PVector temp2 = multiPointTemp.get(i);   
@@ -453,7 +447,6 @@ void findPositions(PImage depthImage) {
       }
     } else {
       // no blobs found
-
       if (millis() > lastTrackingMillis+400) {
         // delay before setting active to false 
         trackingAtive = false;
