@@ -6,10 +6,8 @@ let fpsAverage = 0;
 let vw = 1; // 1 percent of viewport width;
 let vh = 1; // 1 percent of viewport height;
 /*  aspect ratio control */
-
 const pageWidth = 1080 * screens.length; // resolution 
 const pageHeight = 1920; //
-
 
 function correctAspectRatio() {
   let offsetX = 0;
@@ -26,10 +24,6 @@ function correctAspectRatio() {
     screens[i].cntX = screens[i].x + screens[i].w/2;
     screens[i].cntY = screens[i].h/2; 
   }
-  // 
-//
-
-  // 
   vw = width*0.01; // 1 percent of viewport width;
   vh = height*0.01;// 1 percent of viewport height;  
 }
@@ -62,15 +56,11 @@ function getWindowHeight() {
     // for landscape mode
     posterHeight = window.innerHeight;
   }
-  //console.log("windowWidth = "+window.innerWidth+" displaywidth = "+displayWidth);
-  //console.log("windowHeight = "+window.innerHeight+" displayHeight = "+displayHeight);
-
   if (window.innerHeight == screen.height) {
     fullscreenMode = true;
   } else {
     fullscreenMode = false;
   }
-  //console.log(_renderer._curCamera);
   console.log("fullscreenMode = "+fullscreenMode);
   return posterHeight;
   
@@ -154,7 +144,50 @@ function posterTasks() {
      // if there is no osc connection, then use mouse for position
     updatePosition(mouseX/width,mouseY/height,1.0)
     oscSignal = false;
-    if (enableDepthStream) {
+    placeHolderAnimation();
+  } else {
+    oscSignal = true;
+  }
+  
+  try {
+    window.parent.trackingCallback(tracking, oscSignal);
+  }   catch(e) {
+  }
+
+
+  // show helplines when outside of fullscreen mode
+  let debug = true;
+  if (!fullscreenMode && debug) {
+      push();
+      if (_renderer.drawingContext instanceof WebGLRenderingContext) {
+        translate(-width/2,-height/2,0);
+      }
+      fill(0, 180, 180);
+      noStroke();
+      fpsAverage = fpsAverage * 0.9;
+      fpsAverage += frameRate() * 0.1;
+      textSize(1.2*vw);
+      textAlign(LEFT, TOP);
+      text("fps: "+Math.floor(fpsAverage), screens[0].x+vw, screens[0].y+vh);
+      text("Streaming: "+oscSignal, screens[0].x+vw, screens[0].y+vh+vh+vh);
+      text("tracking: "+tracking, screens[0].x+vw, screens[0].y+vh+vh+vh+vh+vh);
+      noFill();
+      stroke(0, 180, 180);  
+      rectMode(CORNER);
+      rect(screens[0].x, screens[0].y, width, height);
+      // line between screens
+      for (let i = 1; i<screens.length; i++) {
+        screens[i].w = floor(width/screens.length);
+        line(screens[i].x, screens[i].y, screens[i].x, screens[i].y+screens[i].h); // line between 1st and 2nd screen
+      }
+
+      pop();
+      showPoint(position);
+  }
+}
+
+function placeHolderAnimation() {
+  if (enableDepthStream) {
     // placeholder patern
       try {
         depthH = 140 ;
@@ -183,48 +216,7 @@ function posterTasks() {
       }
 
     }
-  
-  } else {
-    oscSignal = true;
-  }
-  
-  try {
-    window.parent.trackingCallback(tracking, oscSignal);
-  }   catch(e) {
-  }
 
-
-  // show helplines when outside of fullscreen mode
-  //(window.innerWidth == screen.width && window.innerHeight == screen.height)
-  let debug = true;
-  if (!fullscreenMode && debug) {
-
-      push();
-      if (_renderer.drawingContext instanceof WebGLRenderingContext) {
-        translate(-width/2,-height/2,0);
-      }
-      fill(0, 180, 180);
-      noStroke();
-      fpsAverage = fpsAverage * 0.9;
-      fpsAverage += frameRate() * 0.1;
-      textSize(1.2*vw);
-      textAlign(LEFT, TOP);
-      text("fps: "+Math.floor(fpsAverage), screens[0].x+vw, screens[0].y+vh);
-      text("Streaming: "+oscSignal, screens[0].x+vw, screens[0].y+vh+vh+vh);
-      text("tracking: "+tracking, screens[0].x+vw, screens[0].y+vh+vh+vh+vh+vh);
-      noFill();
-      stroke(0, 180, 180);  
-      rectMode(CORNER);
-      rect(screens[0].x, screens[0].y, width, height);
-      // line between screens
-      for (let i = 1; i<screens.length; i++) {
-        screens[i].w = floor(width/screens.length);
-        line(screens[i].x, screens[i].y, screens[i].x, screens[i].y+screens[i].h); // line between 1st and 2nd screen
-      }
-
-      pop();
-      showPoint(position);
-  }
 }
 
 function bellCurve(t, b, c) {

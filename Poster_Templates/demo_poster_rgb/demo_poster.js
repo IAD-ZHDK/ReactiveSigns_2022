@@ -6,12 +6,11 @@
 
 function setup() {
   createCanvas(getWindowWidth(), getWindowHeight()); // impartant! Don't modify this line. 
-  setupOSC(true); // Don't remove this line. 1 argument to turn the depthstream on and off
+  setupOSC(true, true); // Don't remove this line. 1 argument to turn the depthstream on and off
 }
 
 function draw() {
   background(0);
-  //lineEffect()
   pixelEffect()
 
   ///////////////
@@ -19,8 +18,6 @@ function draw() {
 }
 
 function pixelEffect() {
- 
-  //fill(rgbData);
   noStroke();
   let spaceX = width/depthW;
   let spaceY = height/depthH;
@@ -29,6 +26,7 @@ function pixelEffect() {
     for (let j = 0; j<depthW; j+=2) {
       let index = (i*depthW)+j;
         if (dataFiltered[index] > 0.0) {
+        //  fill(255)
         fill(rData[index],gData[index],bData[index])
         rect(spaceX*j+dataFiltered[index]*0.2, spaceY*i+dataFiltered[index]*0.2, 5, 5);
       }

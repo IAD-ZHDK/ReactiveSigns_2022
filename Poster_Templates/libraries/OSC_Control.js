@@ -27,7 +27,6 @@ function setupOSC(depthEnabled, rgbEnabled) {
   select('canvas').mouseOut(out);
   select('canvas').mouseOver(over);
   // init buffer
-  // depthImage = createImage(160, 120);
   // setup OSC receiver
   osc.on('/depth', msg => {
     updateDepthImage(msg);
@@ -45,6 +44,19 @@ function setupOSC(depthEnabled, rgbEnabled) {
     console.log("Could not connect: " + e);
   }
   correctAspectRatio();
+  if (enableRGBStream) {
+    let depthH = 140 ;
+    let depthW = 160 ;
+    let depthLength = depthH * depthW;
+    rData = [];
+    gData = [];
+    bData = [];
+    for (let i = 0; i < depthLength; i++) {
+      rData[i] = 100;
+      gData[i] = 100;
+      bData[i] = 100;
+    }
+  }
 }
 function out() {
   if (oscSignal == false) {
@@ -92,7 +104,6 @@ function updateDepthImage(msg) {
     depthW = msg.args[0];
     depthH = msg.args[1];
     data = msg.args[2];
-    //  data = msg.args[2]; 
     /* weighted moving average on every point*/
     try {
       let depthLength = depthW * depthH;
@@ -102,29 +113,24 @@ function updateDepthImage(msg) {
         dataFiltered[i] = int(dataFiltered[i] * 0.9);
         dataFiltered[i] += int(datasplit * 0.1);
       }
+    } catch (e) {
+      console.log("data not defined yet");
+      dataFiltered = Array.from(msg.args[2]);
+    }
+
+    try {
       if (enableRGBStream) {
         rData = msg.args[7];
         gData = msg.args[8];
         bData = msg.args[9];
-        /*
-       let r = msg.args[7] >> 24; 
-       let g = msg.args[7] >> 16; 
-       let b = msg.args[7] >> 8; 
-       */
       }
-
     } catch (e) {
-      console.log("data not defined yet");
-      dataFiltered = Array.from(msg.args[2]);
-      if (enableRGBStream) {
-        rData = Array.from(msg.args[7]);
-        gData = Array.from(msg.args[8]);
-        bData = Array.from(msg.args[9]);
-      }
+      console.log("rgb data not defined yet");
+ 
     }
 
-
   }
+
   //
   // uncomment to recreate image
   //

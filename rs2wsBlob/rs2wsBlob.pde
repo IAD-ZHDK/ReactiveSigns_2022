@@ -1,4 +1,4 @@
-// realsense 2 websocket //<>//
+// realsense 2 websocket //<>// //<>//
 // sends depth data from realsense to websockets
 // written 2021 by Florian Bruggisser
 // modified by Luke Franzke for the Reactive Signs Module, ZHdK
@@ -19,11 +19,11 @@ ControlP5 cp5;
 
 Range range;
 
-boolean demoAlowed = false;
+boolean demoAlowed = true;
 boolean editable = false;
 
 boolean streamDepth = true;
-boolean streamRGB = true;
+boolean streamRGB = false;
 final int WIDTH = 640;
 final int HEIGHT = 480;
 final int DECIMATION = 4;
@@ -110,7 +110,7 @@ void setup() {
    cp5.addToggle("streamRGB")
     .setPosition(100, height-90)
     .setSize(50, 20)
-    .setValue(false)
+    .setValue(streamRGB)
     .setMode(ControlP5.SWITCH)
     .setCaptionLabel("Stream RGB")
     ;
@@ -150,9 +150,9 @@ boolean setupOSC() {
     ws = new WebsocketServer(this, PORT, "/");
     // setup buffer
     depthBuffer = new byte[WIDTH / DECIMATION * HEIGHT / DECIMATION];
-    rBuffer = new byte[WIDTH * HEIGHT ];
-    gBuffer = new byte[WIDTH * HEIGHT ];
-    bBuffer = new byte[WIDTH * HEIGHT ];
+    rBuffer = new byte[WIDTH / DECIMATION * HEIGHT / DECIMATION];
+    gBuffer = new byte[WIDTH / DECIMATION * HEIGHT / DECIMATION];
+    bBuffer = new byte[WIDTH / DECIMATION * HEIGHT / DECIMATION];
   }
 
   catch (Exception ex) {
