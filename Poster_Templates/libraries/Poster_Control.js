@@ -125,6 +125,19 @@ function keyPressed() {
     parent.pickPoster(key)
   }   catch(e) {
   }
+  if (keyCode >65 && keyCode <90) {
+    let body = select('body');
+    console.log(body.style('transform')) 
+    if (body.style('transform') === 'none') {
+     body.style('transform', 'rotate(90deg)');
+    } else {
+      body.style('transform', 'none');
+    }
+    try {
+      windowScaled();
+    }   catch(e) {
+    }
+  }
 }
 
 function showPoint(pos) {
