@@ -8,6 +8,21 @@ iframeSwitcher contains the
 ![Posters](/Raw/JT_Poster.gif?raw=true)| ![Posters](/Raw/RC_DS_Gif_Animation.gif?raw=true)         
 :-------------------------------------:|:---------------------------------:
 
+For running the poster, there are two lines needed in the setup function and one in the draw function.  
+
+ ```javascript
+function setup() {
+   /*important!*/ createCanvas(getWindowWidth(), getWindowHeight()); // Don't remove this line. You may change the render to WEBGL if you wish 
+   /*important!*/ setupOSC(false);  // Don't remove this line. The optional boolean argument turns the depthstream on and off. A 2nd boolean parameter enables an RGB stream. 
+ 
+}
+
+function draw() {
+/*important!*/ posterTasks(); // Don't remove this line  
+} 
+ 
+```
+
  These variables hold the coordinates of a tracker point, based on the camera and blob detection. When no camera is available the data will be controled by the mouse.
 
  ```javascript
