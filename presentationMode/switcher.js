@@ -15,6 +15,7 @@ function trackingCallback(tracking, OSCstreaming) {
   streaming = OSCstreaming
 }
 
+
 function changePoster() {
   console.log("changing posters")
   let newPosterURL = parent+''+posters[posterCount]+''+indexFile
