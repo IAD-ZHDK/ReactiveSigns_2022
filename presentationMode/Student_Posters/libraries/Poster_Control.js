@@ -1,17 +1,13 @@
 let oscSignal = false;// osc signal
 let fullscreenMode = false;
 // helper variables for scalable positioning
-const screen1 = {x:0, y:0, w:100, h:100, cntX: 50, cntY: 50};
-const screen2 = {x:0, y:0, w:100, h:100, cntX: 50, cntY: 50};
-const screen3 = {x:0, y:0, w:100, h:100, cntX: 50, cntY: 50};
+const screens = [{x:0, y:0, w:100, h:100, cntX: 50, cntY: 50}, {x:0, y:0, w:100, h:100, cntX: 50, cntY: 50}]
 let fpsAverage = 0;
 let vw = 1; // 1 percent of viewport width;
 let vh = 1; // 1 percent of viewport height;
 /*  aspect ratio control */
-
-const pageWidth = 2160 * 3; // samsang QM85 resolution (two screens)
-const pageHeight = 3840; // samsang QM85 resolution
-
+const pageWidth = 1080 * screens.length; // resolution 
+const pageHeight = 1920; //
 
 function correctAspectRatio() {
   let offsetX = 0;
@@ -20,29 +16,14 @@ function correctAspectRatio() {
     offsetX = - Math.floor(width/2)
     offsetY = - Math.floor(height/2)
   }
-  screen1.w = Math.floor(width/3);
-  screen1.h = height;
-  screen1.x = offsetX;
-  screen1.y = offsetY;
-  screen1.cntX = screen1.x + screen1.w/2;
-  screen1.cntY = screen1.y + screen1.h/2; 
-  //
-  screen2.w = Math.floor(width/3);
-  screen2.h = height;
-  screen2.x = offsetX + Math.floor(width/3);
-  screen2.y = offsetY;
-  screen2.cntX = (screen2.w/2)+screen2.x;
-  screen2.cntY = (screen2.h/2)+screen2.y; 
-  //
-  screen3.w = Math.floor(width/3);
-  screen3.h = height;
-  screen3.x = offsetX+(floor(width/3)*2);
-  screen3.y = offsetY;
-  screen3.cntX = screen3.w/2+screen3.x;
-  screen3.cntY = screen3.h/2+screen3.y;
-//
-
-  // 
+  for (let i = 0; i<screens.length; i++) {
+    screens[i].w = floor(width/screens.length);
+    screens[i].h = height;
+    screens[i].x = screens[i].w * i;
+    screens[i].y = 0;
+    screens[i].cntX = screens[i].x + screens[i].w/2;
+    screens[i].cntY = screens[i].h/2; 
+  }
   vw = width*0.01; // 1 percent of viewport width;
   vh = height*0.01;// 1 percent of viewport height;  
 }
@@ -75,15 +56,11 @@ function getWindowHeight() {
     // for landscape mode
     posterHeight = window.innerHeight;
   }
-  //console.log("windowWidth = "+window.innerWidth+" displaywidth = "+displayWidth);
-  //console.log("windowHeight = "+window.innerHeight+" displayHeight = "+displayHeight);
-
   if (window.innerHeight == screen.height) {
     fullscreenMode = true;
   } else {
     fullscreenMode = false;
   }
-  //console.log(_renderer._curCamera);
   console.log("fullscreenMode = "+fullscreenMode);
   return posterHeight;
   
@@ -152,6 +129,9 @@ function keyPressed() {
 
 function showPoint(pos) {
   push();
+  if (_renderer.drawingContext instanceof WebGLRenderingContext) {
+    translate(-width/2,-height/2,0);
+  }
   fill(0, 180, 180);
   noStroke();
   circle(pos.x, pos.y, pos.z*10);
@@ -159,11 +139,12 @@ function showPoint(pos) {
 }
 
 function posterTasks() {
-  
+
   if (millis()-lastOSC>=2000) {
      // if there is no osc connection, then use mouse for position
     updatePosition(mouseX/width,mouseY/height,1.0)
     oscSignal = false;
+    placeHolderAnimation();
   } else {
     oscSignal = true;
   }
@@ -175,32 +156,77 @@ function posterTasks() {
 
 
   // show helplines when outside of fullscreen mode
-  //(window.innerWidth == screen.width && window.innerHeight == screen.height)
-  let debug = false;
+  let debug = true;
   if (!fullscreenMode && debug) {
-      if (_renderer.drawingContext instanceof WebGLRenderingContext) {
-        translate(0,0,200);
-      }
       push();
+      if (_renderer.drawingContext instanceof WebGLRenderingContext) {
+        translate(-width/2,-height/2,0);
+      }
       fill(0, 180, 180);
       noStroke();
       fpsAverage = fpsAverage * 0.9;
       fpsAverage += frameRate() * 0.1;
       textSize(1.2*vw);
       textAlign(LEFT, TOP);
-      text("fps: "+Math.floor(fpsAverage), screen1.x+vw, screen1.y+vh);
-      text("Streaming: "+oscSignal, screen1.x+vw, screen1.y+vh+vh+vh);
-      text("tracking: "+tracking, screen1.x+vw, screen1.y+vh+vh+vh+vh+vh);
+      text("fps: "+Math.floor(fpsAverage), screens[0].x+vw, screens[0].y+vh);
+      text("Streaming: "+oscSignal, screens[0].x+vw, screens[0].y+vh+vh+vh);
+      text("tracking: "+tracking, screens[0].x+vw, screens[0].y+vh+vh+vh+vh+vh);
       noFill();
       stroke(0, 180, 180);  
       rectMode(CORNER);
-      rect(screen1.x, screen1.y, width, height);
-      line(screen2.x, screen2.y, screen2.x, screen2.y+screen2.h); // line between 1st and 2nd screen
-      line(screen3.x, screen3.y, screen3.x, screen3.y+screen3.h);  // line between 2nd and 3rd screen
+      rect(screens[0].x, screens[0].y, width, height);
+      // line between screens
+      for (let i = 1; i<screens.length; i++) {
+        screens[i].w = floor(width/screens.length);
+        line(screens[i].x, screens[i].y, screens[i].x, screens[i].y+screens[i].h); // line between 1st and 2nd screen
+      }
+
       pop();
       showPoint(position);
   }
 }
+
+function placeHolderAnimation() {
+  if (enableDepthStream) {
+    // placeholder patern
+      try {
+        depthH = 140 ;
+        depthW = 160 ;
+        let depthLength = depthH * depthW;
+        let reactorX = depthW/2 + sin(frameCount*0.015)*depthW*0.3;
+        let reactorY = depthH/2 + cos(frameCount*0.015)*depthH*0.2;
+  
+        for (let i = 0; i < depthLength; i++) {
+          let x = i%depthW;
+          let y = i/depthW;
+          let dis = dist(x,y,reactorX,reactorY);
+          let scaler = bellCurve(dis, 255, 10);
+          scale = constrain(scale,0,255)
+          dataFiltered[i] = scaler;
+          rData[i] = scaler;
+          gData[i] = 255-scaler;
+          bData[i] = scaler;
+        }
+      } catch(e) {
+        console.log("data not defined yet");
+        dataFiltered = [];
+        rData =[];
+        gData = [];
+        bData = [];
+      }
+
+    }
+
+}
+
+function bellCurve(t, b, c) {
+  // see https://en.wikipedia.org/wiki/Gaussian_function
+    // t = time
+    // b = amplitude
+    // c = wavelength 
+    var scaler = 1+(c/sqrt((c*c)+(t*t)))*b; //bell curve
+    return scaler;
+  }
 
 function openFullscreen () {
   let elem = document.documentElement
