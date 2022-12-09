@@ -13,8 +13,8 @@ For running the poster, there are two lines needed in the setup function and one
  ```javascript
 function setup() {
    /*important!*/ createCanvas(getWindowWidth(), getWindowHeight()); // Don't remove this line. You may change the render to WEBGL if you wish 
+   
    /*important!*/ setupOSC(false);  // Don't remove this line. The optional boolean argument turns the depthstream on and off. A 2nd boolean parameter enables an RGB stream. 
- 
 }
 
 function draw() {

@@ -130,8 +130,13 @@ function keyPressed() {
     console.log(body.style('transform')) 
     if (body.style('transform') === 'none') {
      body.style('transform', 'rotate(90deg)');
+     cameraSave(); // work around for play.js
+     resizeCanvas(windowHeight, windowWidth);
+     cameraRestore(); // work around for play.js
+     correctAspectRatio();  
     } else {
       body.style('transform', 'none');
+      resized();  
     }
     try {
       windowScaled();
