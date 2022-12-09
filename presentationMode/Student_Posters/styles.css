@@ -35,7 +35,7 @@
   }
 
   body {
-    transform: rotate(90deg);
+    transform: rotate(-90deg);
     padding:
       0;
     margin:
