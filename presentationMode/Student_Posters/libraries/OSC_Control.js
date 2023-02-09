@@ -9,14 +9,14 @@ let rData // array of red data
 let gData // array of red data
 let bData // array of red data
 let dataFiltered;
-let depthW; // width of data array
-let depthH; // width of height array
+let depthW = 140; // width of data array
+let depthH = 160; // width of height array
 let position;// blob center 
 let posNormal// blob center normalised
 let tracking = false; // if someone is infront of the camera 
 let mouseOverC;
 function setupOSC(depthEnabled, rgbEnabled) {
-  // this.mouseOver(mouseOverCanvas);
+
   enableDepthStream = depthEnabled;
   enableRGBStream = rgbEnabled;
   lastOSC = millis();
@@ -24,8 +24,13 @@ function setupOSC(depthEnabled, rgbEnabled) {
   posNormal = createVector(0, 0, 0); // normalised
   //
   //const myCanvas = document.getElementById('defaultCanvas0');
-  select('canvas').mouseOut(out);
-  select('canvas').mouseOver(over);
+  try {
+    select('canvas').mouseOut(out);
+    select('canvas').mouseOver(over);
+  } catch(e){
+    
+  }
+
   // init buffer
   // setup OSC receiver
   osc.on('/depth', msg => {

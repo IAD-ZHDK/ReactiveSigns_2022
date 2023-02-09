@@ -30,40 +30,61 @@ function correctAspectRatio() {
 
 
 function getWindowWidth() {
+
+  let displayWidth = window.innerWidth;
+  let displayHeight = window.innerHeight;
+  //const body = document.getElementsByTagName('body'); // 
+  let body = select('body');
+
+  if (body.style('transform') == 'matrix(0, 1, -1, 0, 0, 0)' || body.style('transform') == 'matrix(0, -1, 1, 0, 0, 0)') {
+   // console.log("rotated display")
+       // workaround for rotated display
+     displayWidth = window.innerHeight;
+     displayHeight = window.innerWidth;
+  }
+
   let aspectRatioWH = pageWidth/pageHeight; // width to height
   let aspectRatioHW = pageHeight/pageWidth; // height to width
 
-  let currentRatio = window.innerWidth/window.innerHeight;
+  let currentRatio = displayWidth/displayHeight;
 
-  if (window.innerWidth < window.innerHeight*aspectRatioWH) {
+  if (displayWidth < displayHeight*aspectRatioWH) {
     // for portrait mode
-    posterWidth = window.innerWidth;
+    posterWidth = displayWidth;
   } else {
     // for landscape mode
-    posterWidth = Math.floor(window.innerHeight*aspectRatioWH);
+    posterWidth = Math.floor(displayHeight*aspectRatioWH);
   }
   return posterWidth;
 }
 
 function getWindowHeight() {
-  
+ 
+  let displayWidth = window.innerWidth;
+  let displayHeight = window.innerHeight;
+  let body = select('body');
+  if (body.style('transform') == 'rotate(90deg)') {
+  //  console.log("rotated display")
+      // workaround for rotated display
+    displayWidth = window.innerHeight;
+    displayHeight = window.innerWidth;
+  }
   let aspectRatioWH = pageWidth/pageHeight; // width to height
   let aspectRatioHW = pageHeight/pageWidth; // height to width
-  if (window.innerWidth < window.innerHeight*aspectRatioWH) {
+  if (displayWidth < displayHeight*aspectRatioWH) {
     // for portrait mode
-    posterHeight = Math.floor(window.innerWidth*aspectRatioHW);
+    posterHeight = Math.floor(displayWidth*aspectRatioHW);
   } else {
     // for landscape mode
-    posterHeight = window.innerHeight;
+    posterHeight = displayHeight;
   }
-  if (window.innerHeight == screen.height) {
+  if (displayHeight == screen.height) {
     fullscreenMode = true;
   } else {
     fullscreenMode = false;
   }
-  console.log("fullscreenMode = "+fullscreenMode);
+
   return posterHeight;
-  
 }
 
 document.addEventListener('fullscreenchange', (event) => {
@@ -125,8 +146,24 @@ function keyPressed() {
     parent.pickPoster(key)
   }   catch(e) {
   }
+  
+  if (keyCode >65 && keyCode <90) {
+    let body = select('body');
+    console.log(body.style('transform')) 
+    if (body.style('transform') === 'none') {
+     body.style('transform', 'rotate(90deg)');
+     resized();
+    } else {
+      body.style('transform', 'none');
+      resized();  
+    }
+    try {
+      windowScaled();
+    }   catch(e) {
+    }
+  }
+  
 }
-
 function showPoint(pos) {
   push();
   if (_renderer.drawingContext instanceof WebGLRenderingContext) {
@@ -154,7 +191,6 @@ function posterTasks() {
   }   catch(e) {
   }
 
-
   // show helplines when outside of fullscreen mode
   let debug = true;
   if (!fullscreenMode && debug) {
@@ -168,11 +204,12 @@ function posterTasks() {
       fpsAverage += frameRate() * 0.1;
       textSize(1.2*vw);
       textAlign(LEFT, TOP);
-      text("fps: "+Math.floor(fpsAverage), screens[0].x+vw, screens[0].y+vh);
-      text("Streaming: "+oscSignal, screens[0].x+vw, screens[0].y+vh+vh+vh);
-      text("tracking: "+tracking, screens[0].x+vw, screens[0].y+vh+vh+vh+vh+vh);
+      text("fps: " + Math.floor(fpsAverage), screens[0].x+vw, screens[0].y+vh);
+      text("Streaming: " + oscSignal, screens[0].x+vw, screens[0].y+vh+vh+vh);
+      text("tracking: " + tracking, screens[0].x+vw, screens[0].y+vh+vh+vh+vh+vh);
       noFill();
       stroke(0, 180, 180);  
+      strokeWeight(1);
       rectMode(CORNER);
       rect(screens[0].x, screens[0].y, width, height);
       // line between screens
@@ -180,7 +217,6 @@ function posterTasks() {
         screens[i].w = floor(width/screens.length);
         line(screens[i].x, screens[i].y, screens[i].x, screens[i].y+screens[i].h); // line between 1st and 2nd screen
       }
-
       pop();
       showPoint(position);
   }

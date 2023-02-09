@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <script language="javascript" type="text/javascript" src="../libraries/svg.min.js"></script>
+  <script language="javascript" type="text/javascript" src="../libraries/p5.min.js"></script>
+  <script language="javascript" type="text/javascript" src="../libraries/osc.min.js"></script>
+  <script language="javascript" type="text/javascript" src="../libraries/Poster_Control.js"></script>
+  <script language="javascript" type="text/javascript" src="../libraries/OSC_Control.js"></script>
+  
+  <script language="javascript" type="text/javascript" src="poster.js"></script>
+  
+  <meta charset="utf-8" />
+</head>
+
+
+
+<body>
+    <svg id="svg" viewBox="0 0 2160 1920" fill="white" xmlns="http://www.w3.org/2000/svg">
+      <circle id="pendulum" cx="1080" cy="960" r="1080" fill="black" />
+      <circle id="horizon" cx="1080" cy="11000" r="10000" fill="black" />
+      <g id="k2">
+        <rect x="1820" y="370" width="80" height="440" fill="black" />
+        <rect x="1820" y="810" width="220" height="160" fill="black" />
+        <rect x="1820" y="1470" width="80" height="80" fill="black" />
+        <rect x="1780" y="1550" width="120" height="10" fill="black" />
+        <rect x="2040" y="370" width="80" height="230" fill="black" />
+        <rect x="2040" y="600" width="80" height="210" fill="black" />
+        <rect x="2040" y="970" width="80" height="580" fill="black" />
+        <rect x="2000" y="1550" width="160" height="10" fill="black" />
+        <rect x="1780" y="360" width="120" height="10" fill="black" />
+        <rect x="2000" y="360" width="160" height="10" fill="black" />
+        <rect x="1820" y="970" width="80" height="500" fill="black" />
+      </g>
+      <g id="a">
+        <rect x="626" y="370" width="80" height="489" fill="black" />
+        <rect x="486" y="360" width="140" height="160" fill="black" />
+        <rect x="406" y="370" width="80" height="680" fill="black" />
+        <rect x="486" y="810" width="140" height="160" fill="black" />
+        <rect x="366" y="1550" width="160" height="10" fill="black" />
+        <rect x="366" y="360" width="120" height="10" fill="black" />
+        <rect x="586" y="1550" width="160" height="10" fill="black" />
+        <rect x="626" y="360" width="120" height="10" fill="black" />
+        <rect x="626" y="859" width="80" height="691" fill="black" />
+        <rect x="406" y="1050" width="80" height="500" fill="black" />
+      </g>
+      <g id="t2">
+        <rect x="1240" y="360" width="150" height="160" fill="black" />
+        <rect x="1390" y="360" width="150" height="160" fill="black" />
+        <rect x="1350" y="520" width="80" height="1030" fill="black" />
+        <rect x="1310" y="1550" width="160" height="10" fill="black" />
+      </g>
+  
+      <g id="k1">
+        <rect x="860" y="370" width="80" height="440" fill="black" />
+        <rect x="860" y="810" width="220" height="160" fill="black" />
+        <rect x="860" y="970" width="80" height="580" fill="black" />
+        <rect x="820" y="1550" width="120" height="10" fill="black" />
+        <rect x="1080" y="370" width="80" height="440" fill="black" />
+        <rect x="1080" y="970" width="80" height="580" fill="black" />
+        <rect x="1040" y="1550" width="160" height="10" fill="black" />
+        <rect x="820" y="360" width="120" height="10" fill="black" />
+        <rect x="1040" y="360" width="160" height="10" fill="black" />
+      </g>
+      <g id="i">
+        <rect x="1610" y="805" width="80" height="745" fill="black" />
+        <rect x="1610" y="370" width="80" height="238" fill="black" />
+        <rect x="1610" y="608" width="80" height="197" fill="black" />
+        <rect x="1570" y="1550" width="160" height="10" fill="black" />
+        <rect x="1570" y="360" width="160" height="10" fill="black" />
+      </g>
+      <g id="t1">
+        <rect y="360" width="300" height="160" fill="black" />
+        <rect x="110" y="520" width="80" height="358" fill="black" />
+        <rect x="110" y="878" width="80" height="672" fill="black" />
+        <rect x="70" y="1550" width="160" height="10" fill="black" />
+      </g>
+      <g id="top-ornaments">
+        <rect x="70" y="1760" width="336" height="80" fill="black" />
+        <rect x="586" y="1760" width="834" height="160" fill="black" />
+        <rect x="1690" y="1690" width="430" height="80" fill="black" />
+        <rect x="70" y="1690" width="516" height="10" fill="black" />
+        <rect x="706" y="1690" width="904" height="10" fill="black" />
+        <rect x="1540" y="1830" width="580" height="10" fill="black" />
+        <rect x="70" y="1620" width="416" height="10" fill="black" />
+      </g>
+      <g id="bottom-ornaments">
+        <rect x="640" y="150" width="440" height="80" fill="black" />
+        <rect y="70" width="480" height="160" fill="black" />
+        <rect x="1610" width="290" height="80" fill="black" />
+        <rect x="820" y="70" width="420" height="10" fill="black" />
+        <rect x="1240" y="151" width="660" height="10" fill="black" />
+        <rect x="2000" y="220" width="160" height="10" fill="black" />
+        <rect y="290" width="706" height="10" fill="black" />
+      </g>
+    </svg>
+ 
+  
+  <div class="loader"></div>
+</body>
+
+<style>
+  html,
+  body {
+    background-color: black;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+  }
+
+  body {
+    transform: rotate(90deg);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+  }
+
+  #svg {
+    aspect-ratio: 18/16;
+    height: 100vh;
+    background-color: black;
+    filter: invert(1);
+    transform: rotate(0);
+  }
+
+  circle,
+  rect {
+    fill: white;
+    mix-blend-mode: difference;
+    shape-rendering: crispEdges;
+  }
+</style>
+
+</html>

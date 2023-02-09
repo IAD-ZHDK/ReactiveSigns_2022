@@ -1,9 +1,9 @@
 let parent = 'Student_Posters/'
 let indexFile ='/index.html'
-let posters = ['test']
+let posters = ['Group1','Group2','Group3','Group4','Group5','Group6','Group7']
 let testPoster = "placeholder/index.html"
 // not used: 
-let posterCount = 0
+let posterCount = 1
 let intervalTime = 120000; //2 minutes
 let trackingActive = false;
 let startedFlag = false;
@@ -56,7 +56,7 @@ function transition() {
     let fader = iframeDocument.getElementById('loader');
     fader.classList.toggle('fadeout');
   }   catch(e) {
-    console.log("transition failed")
+    console.log("transition failed "+e)
   }
  setTimeout(changePoster, 2000);
 }
@@ -72,7 +72,7 @@ function intervalHandler(){
    } else if (!streaming) {
      //reload demo poster to try connecting via osc again  
      clearInterval(myInterval);
-     myInterval = setInterval(intervalHandler, 6000); 
+     myInterval = setInterval(intervalHandler, 3500); 
      loadTestPoster();
    } else {
     // skip change if someone is in front of poster, try again after delay 
@@ -82,7 +82,7 @@ function intervalHandler(){
    } 
 }
 
-let myInterval = setInterval(intervalHandler, 6000); 
+let myInterval = setInterval(intervalHandler, intervalTime); 
 
 
 
