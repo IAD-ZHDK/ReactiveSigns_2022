@@ -26,7 +26,7 @@ function setup() {
 
   /*important!*/createCanvas(getWindowWidth(), getWindowHeight()); // impartant! Don't modify this line.
   /*important!*/setupOSC(true); // important! Don't remove this line. The boolean argument turns the depthstream on and off
-  //frameRate(20)
+  frameRate(20)
   setupGrid(gridResolutionW);
   createTileImages(tileWidth)
 }

@@ -146,7 +146,7 @@ function keyPressed() {
     parent.pickPoster(key)
   }   catch(e) {
   }
-  
+  /*
   if (keyCode >65 && keyCode <90) {
     let body = select('body');
     console.log(body.style('transform')) 
@@ -162,7 +162,7 @@ function keyPressed() {
     }   catch(e) {
     }
   }
-  
+  */
 }
 function showPoint(pos) {
   push();
