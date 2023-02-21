@@ -63,8 +63,8 @@ function getWindowHeight() {
   let displayWidth = window.innerWidth;
   let displayHeight = window.innerHeight;
   let body = select('body');
-  if (body.style('transform') == 'rotate(90deg)') {
-  //  console.log("rotated display")
+  if (body.style('transform') == 'matrix(0, 1, -1, 0, 0, 0)' || body.style('transform') == 'matrix(0, -1, 1, 0, 0, 0)') {
+    //  console.log("rotated display")
       // workaround for rotated display
     displayWidth = window.innerHeight;
     displayHeight = window.innerWidth;
@@ -78,7 +78,7 @@ function getWindowHeight() {
     // for landscape mode
     posterHeight = displayHeight;
   }
-  if (displayHeight == screen.height) {
+  if (displayHeight == screen.height || displayWidth == screen.height) {
     fullscreenMode = true;
   } else {
     fullscreenMode = false;
@@ -207,6 +207,9 @@ function posterTasks() {
       text("fps: " + Math.floor(fpsAverage), screens[0].x+vw, screens[0].y+vh);
       text("Streaming: " + oscSignal, screens[0].x+vw, screens[0].y+vh+vh+vh);
       text("tracking: " + tracking, screens[0].x+vw, screens[0].y+vh+vh+vh+vh+vh);
+      text("resolution "+width+" x "+ height, screens[0].x+vw, screens[0].y+vh+vh+vh+vh+vh+vh+vh);
+		  text("aspect Ratio: 1 to "+(height/width), screens[0].x+vw, screens[0].y+vh+vh+vh+vh+vh+vh+vh+vh+vh);
+		
       noFill();
       stroke(0, 180, 180);  
       strokeWeight(1);

@@ -16,7 +16,7 @@ let posNormal// blob center normalised
 let tracking = false; // if someone is infront of the camera 
 let mouseOverC;
 function setupOSC(depthEnabled, rgbEnabled) {
-
+  noCursor();
   enableDepthStream = depthEnabled;
   enableRGBStream = rgbEnabled;
   lastOSC = millis();

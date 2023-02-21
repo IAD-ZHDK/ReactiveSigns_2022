@@ -63,7 +63,7 @@ function setup() {
 function draw() {
 	//get tracking data
 	trackedX = map(posNormal.x, 0, 1.26, 0, windowWidth) //should be normalized between 0 -1
-	trackedX = mouseX
+	//trackedX = mouseX
 	if (trackedX < 50 || trackedX < windowWidth - 10) objectInsideRange = true
 	else objectInsideRange = false
 

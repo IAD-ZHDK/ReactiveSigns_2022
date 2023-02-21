@@ -31,9 +31,11 @@ function setup() {
   /*important!*/createCanvas(getWindowWidth(), getWindowHeight()); // Don't remove this line.
  /*important!*/ setupOSC(false); // Don't remove this line. The boolean argument turns the depthstream on and off
   textAlign(CENTER);
-
-  let img = imgs[imgIndex];
-
+  
+  let img = imgs[0];
+  img.resize(width,height);
+  img = imgs[1];
+  img.resize(width,height);
   // Create hotspots.
   for (let i = 0; i < 4; i++) {
     hotspots.push(new Hotspot());

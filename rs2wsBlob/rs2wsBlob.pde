@@ -49,7 +49,7 @@ RSThresholdFilter thresholdFilter;
 //
 // camera params 
 //
-boolean cameraFlip = false;
+boolean cameraFlip = true;
 float minDistance = 0.0f;
 float maxDistance = 10.0f;
 float lowDistance = minDistance;

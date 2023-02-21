@@ -35,8 +35,12 @@ function setup() {
    textSize(fontSize);
    textAlign(LEFT, TOP)
    lineHeight = 0.2*vw
-   rowHeight = height/3 
-   
+   //rowHeight = height/3 
+   rowHeight = (height/3)
+   row1.resize(width*2, rowHeight)
+   row2.resize(width*3, rowHeight)
+   row3.resize(width*4, rowHeight)
+
    textBox = font.textBounds(infoText, 0, 0, fontSize, LEFT, TOP)
    textWidth = textBox.w
 }
@@ -50,9 +54,9 @@ function draw() {
   let row3X = constrain(map(posNormal.x, 0.1, 0.9, -3*width, 0), -3*width, 0)
  
  
-  image(row1, row1X, 0, width*2, rowHeight)
-  image(row2, row2X, rowHeight, width*3, rowHeight)
-  image(row3, row3X, rowHeight*2, width*4, rowHeight)
+  image(row1, row1X, 0)
+  image(row2, row2X, rowHeight)
+  image(row3, row3X, rowHeight*2)
 
   fill(255)
   if(tracking == true){
@@ -82,10 +86,27 @@ function windowScaled() { // this is a custom event called whenever the poster i
   fontSize = 1.33*vw
   textSize(fontSize); 
   lineHeight = 0.2*vw
-  rowHeight = (height-(2*(fontSize+lineHeight*2-vw)))/3
+  rowHeight = (height/3)
   textBox = font.textBounds(infoText, 0, 0, fontSize, LEFT, TOP)
   textWidth = textBox.w
+
+  loadImage('rows/SVG/row1.png', img => {
+    row1 = img
+    row1.resize(width*2, rowHeight)
+  });
+
+  loadImage('rows/SVG/row2.png', img => {
+    row2 = img
+    row2.resize(width*3, rowHeight)
+  });
+
+  loadImage('rows/SVG/row3.png', img => {
+    row3 = img
+    row3.resize(width*4, rowHeight)
+  });
+
 }
+
 
 function easeInOutQuint(x) {
   return x < 0.5 ? 16 * x * x * x * x * x : 1 - Math.pow(-2 * x + 2, 5) / 2;

@@ -253,6 +253,8 @@ function posterTasksDebug() {
 		debugScreen.text("fps: "+Math.floor(fpsAverage), screens[0].x+vw, screens[0].y+vh);
 		debugScreen.text("Streaming: "+oscSignal, screens[0].x+vw, screens[0].y+vh+vh+vh);
 		debugScreen.text("tracking: "+tracking, screens[0].x+vw, screens[0].y+vh+vh+vh+vh+vh);
+		debugScreen.text("resolution "+width+" x "+ height, screens[0].x+vw, screens[0].y+vh+vh+vh+vh+vh);
+		debugScreen.text("aspect Ratio: 1 to "+(height/width), screens[0].x+vw, screens[0].y+vh+vh+vh+vh+vh);
 		debugScreen.noFill();
 		debugScreen.stroke(0, 180, 180);  
 		debugScreen.rectMode(CORNER);
