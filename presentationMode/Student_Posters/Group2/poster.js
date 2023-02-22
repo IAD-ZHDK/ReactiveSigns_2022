@@ -19,7 +19,8 @@ let trackedX = 500
 let d, h, h12, m, s, hAngle, mAngle, sAngle
 
 function setup() {
-	noCanvas() //@paulina & luke: poster switching logics should be changed accordingly. our sketch basically takes places in a svg with id "svg" with aspect ratio of 18:16 instead of default canvas
+	//noCanvas() //@paulina & luke: poster switching logics should be changed accordingly. our sketch basically takes places in a svg with id "svg" with aspect ratio of 18:16 instead of default canvas
+	createCanvas(getWindowWidth(), getWindowHeight());
 	setupOSC(false) // impartant! Don't modify this line.
 
 	frameRate(60)
@@ -61,6 +62,7 @@ function setup() {
 }
 
 function draw() {
+	clear();
 	//get tracking data
 	trackedX = map(posNormal.x, 0, 1.26, 0, windowWidth) //should be normalized between 0 -1
 	//trackedX = mouseX

@@ -106,8 +106,8 @@ function draw() {
   /*important!*/posterTasks(); // do not remove this last line!  
 }
 function snap(pos, target) {
-	const snapDistance = 0.1;
-		const snapIntensity = 3;
+	const snapDistance = 0.07;
+		const snapIntensity = 1.5;
 		let result = pos;
 		let distance = abs(pos-target);
 		if (distance<snapDistance) {
