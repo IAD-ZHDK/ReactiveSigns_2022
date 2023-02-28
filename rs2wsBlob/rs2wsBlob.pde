@@ -28,7 +28,7 @@ final int WIDTH = 640;
 final int HEIGHT = 480;
 final int DECIMATION = 4;
 final boolean recording = false; // used for creating demo footage
-boolean replaying = false; // reply emo footage
+boolean replaying = false; // replay demo footage
 int recordingCount = 0; //frame count for exported images
 PImage[] recordingFrames;
 int totalFrames = 0;
@@ -49,7 +49,8 @@ RSThresholdFilter thresholdFilter;
 //
 // camera params 
 //
-boolean cameraFlip = true;
+boolean cameraFlip = false;
+boolean cameraHorizontal = true;
 float minDistance = 0.0f;
 float maxDistance = 10.0f;
 float lowDistance = minDistance;
@@ -291,6 +292,7 @@ void drawCamara() {
     g.endDraw();
     depth = g.get();
     //  rgb image
+    if (streamRGB) {
     PGraphics rgb;
     rgb = createGraphics(rgbImage.width, rgbImage.height);
     rgb.beginDraw();
@@ -301,13 +303,49 @@ void drawCamara() {
     rgb.popMatrix();
     rgb.endDraw();
     rgbImage = rgb.get();
+    }
+  } 
+  if (cameraHorizontal && !replaying) {
+    // depth image
+    PGraphics g;
+    g = createGraphics(depth.width, depth.height);
+    g.beginDraw();
+    g.pushMatrix();
+    g.scale(-1, 1);
+    g.translate(-g.width, 0);
+    g.image(depth, 0, 0);
+    g.popMatrix();
+    g.endDraw();
+    depth = g.get();
+    //  rgb image
+     if (streamRGB) {
+    PGraphics rgb;
+    rgb = createGraphics(rgbImage.width, rgbImage.height);
+    rgb.beginDraw();
+    rgb.pushMatrix();
+    rgb.scale(-1, 1);
+    rgb.translate(-rgb.height, 0);
+    rgb.image(rgbImage, 0, 0);
+    rgb.popMatrix();
+    rgb.endDraw();
+    rgbImage = rgb.get();
+     }
   }
+  
+  
+  
   PImage depthCrop = depth.get(floor(depth.width*cropX), floor(depth.height*cropY), floor(depth.width*cropWidth), floor(depth.height*cropHeight));
+  
+      if (streamRGB) {
   PImage rgbCrop = rgbImage.get(floor(rgbImage.width*cropX), floor(rgbImage.height*cropY), floor(rgbImage.width*cropWidth), floor(rgbImage.height*cropHeight));
-  
-  rgbCrop.resize(rgbCrop.width/DECIMATION, rgbCrop.height/DECIMATION);
-  
-   displayInterface(depth, rgbCrop, depthCrop.width, depthCrop.height);
+    rgbCrop.resize(rgbCrop.width/DECIMATION, rgbCrop.height/DECIMATION);
+    sendPImage(depthCrop, rgbCrop, singlePointAverage, trackingAtive, "/depth");
+  } else {
+      sendPImage(depthCrop, depthCrop, singlePointAverage, trackingAtive, "/depth");
+  }
+ 
+ displayInterface(depth, depthCrop.width, depthCrop.height);
+
   // recording image for usage without camera
   //
   if (cameraRunning || replaying) {
@@ -321,8 +359,7 @@ void drawCamara() {
     fill(0, 255, 0);
     circle(singlePointAverage.x*width, singlePointAverage.y*height, singlePointAverage.z);
   }
-
-  sendPImage(depthCrop, rgbCrop, singlePointAverage, trackingAtive, "/depth");
+  
   // recording
   if (recording) {
     depth.save("data/recordings/outputImage"+recordingCount+".jpg");

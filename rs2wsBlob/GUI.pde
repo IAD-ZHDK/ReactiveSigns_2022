@@ -1,9 +1,9 @@
 
-void displayInterface(PImage depth, PImage rgbCrop, float depthWidth, float depthHeight) {
+void displayInterface(PImage depth, float depthWidth, float depthHeight) {
   background(55);
   stroke(0, 255, 0);
   image(depth, 0, 0, width, height); 
-  //image(rgbCrop, 0, 0);
+
   if (editable) {
     stroke(0xff08a2cf);
   } else {

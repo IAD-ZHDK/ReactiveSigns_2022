@@ -192,7 +192,7 @@ function posterTasks() {
   }
 
   // show helplines when outside of fullscreen mode
-  let debug = true;
+  let debug = false;
   if (!fullscreenMode && debug) {
       push();
       if (_renderer.drawingContext instanceof WebGLRenderingContext) {

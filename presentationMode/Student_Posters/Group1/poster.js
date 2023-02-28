@@ -1,7 +1,7 @@
 
 let tileWidth;
 let gridResolutionW = 25;
-let gridResolutionH = 25;
+let gridResolutionH = 25; // updated after setup
 let imagePixels = [];
 let b0 = 0.55342686;
 let b1 = 1 - b0;
@@ -10,6 +10,7 @@ let flickerSpeed = 199;
 let centerTextFlag = true;
 let tileImagesA = [];
 let tileImagesB = [];
+let typoBuffer; // storing image for 2nd typography
 
 let GridArray = [];
 //let GridArray2 = [];
@@ -19,7 +20,7 @@ let midText;
 
 function preload() {
   midText = loadImage("assets/FindOutNew.png");
-  // bgText = loadImage("assets/Green_06.9.png");
+  bgText = loadImage("assets/Green_06.9.png");
 }
 
 function setup() {
@@ -29,10 +30,12 @@ function setup() {
   frameRate(20)
   setupGrid(gridResolutionW);
   createTileImages(tileWidth)
+  createTypo2Array();
 }
 function windowScaled() {
   setupGrid(gridResolutionW);
   createTileImages(tileWidth)
+  createTypo2Array();
 }
 
 function createTileImages(w) {
@@ -56,15 +59,47 @@ function createTile(x, y, diameter, angle, _color) {
   return img;
 }
 
+//get background greenscreen image and convert to array for tiles
+function createTypo2Array() {
+  imagePixels = new Array();
+  typoBuffer = createGraphics(gridResolutionW * 2, gridResolutionH);
+  typoBuffer.image(bgText, 0, 0, gridResolutionW * 2, gridResolutionH);
+  typoBuffer.loadPixels();
+ // imagePixels.push()
+  //let d = pixelDensity();
+  //check all pixels and add the white ones to an array with coordinates
+  
+  for (let x = 0; x < gridResolutionW * 2; x++) {
+    for (let y = 0; y < gridResolutionH; y++) {
+			let pixelColor = typoBuffer.get(x, y); 
+			let r = (red(pixelColor) > 200 ); //lets just take the first color channel
+			imagePixels.push(r);
+    }
+  }
+  
+ //image(typoBuffer,0,0);
+}
+//based on imageCreate() take array and print tiles with VertCreate class
+
+function backgoundText() {
+  for (let i = 0; i < GridArray.length; i++) {
+   if (imagePixels[i] == true) {
+    GridArray[i].displayColor = !GridArray[i].colorState;
+   }
+  } 
+}
+
+
+
 
 function draw() {
   background(100)
   flickerGrid(); // need to optimise this 
-  //backgoundText(); // doesn't actually do anything with array it populates.
-   shadowFollow();
+//  backgoundText();
+  shadowFollow();
   drawGrid();
   centerText();
-
+ // imageBackground();
   /*important!*/posterTasks(); // do not remove this last line!
 }
 
@@ -87,10 +122,16 @@ function shadowFollow() {
       let depthY = floor((GridArray[i].y / height) * depthH)
       let index = ((depthY * depthW) + depthX);
       if (dataFiltered[index] > 40.0) {
+        GridArray[i].flipedFlag = true;
         GridArray[i].displayColor = !GridArray[i].colorState;
-      } else {
+      }  else {
         GridArray[i].displayColor = GridArray[i].colorState;
       }
+      if (GridArray[i].flipedFlag == true && imagePixels[i] == true) {
+        // show typo if tyle has been activated one time
+        GridArray[i].displayColor = !GridArray[i].colorState;
+      } 
+
     }
   }
 }
@@ -112,7 +153,7 @@ function setupGrid(gridRes) {
       );
     }
   }
-  console.log(GridArray.length)
+ // console.log(GridArray.length)
 }
 
 
@@ -127,7 +168,6 @@ function flickerGrid() {
     flickerFlag = true;
   } else if (tracking == false && flickerFlag === true) {
     if (int(random(5)) == 1) {
-      // ShadowVertsArray[int(random(ShadowVertsArray.length))].tileOccu = false;
       centerTextFlag = true;
     }
     if (flickerSpeed < 195) {
@@ -140,7 +180,7 @@ function flickerGrid() {
   for (let i = 0; i < 210-flickerSpeed; i++) {
     let flickerGrid = int(random(GridArray.length));
       GridArray[flickerGrid].state = int(random(4));
-      //  GridArray2[flickerGrid].state = int(random(4));
+      GridArray[flickerGrid].flipedFlag = false;
   }
 }
 

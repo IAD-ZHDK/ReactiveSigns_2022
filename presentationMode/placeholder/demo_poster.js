@@ -31,8 +31,8 @@ function draw() {
   //stroke(0);
   //rect(100,100,100,100);
  if (!oscSignal) {
-  wordEffect("Check \n camera \n connection \n and restart",  screens[0].cntX, screens[0].cntY);
-  wordEffect("Check \n camera \n connection \n and restart",  screens[0].cntX, screens[0].cntY);
+  //wordEffect("Check \n camera \n connection \n and restart",  screens[0].cntX, screens[0].cntY);
+  //wordEffect("Check \n camera \n connection \n and restart",  screens[0].cntX, screens[0].cntY);
  } else {
   wordEffect("loading..", screens[0].cntX, screens[0].cntY);
   wordEffect("loading..", screens[1].cntX, screens[1].cntY);
