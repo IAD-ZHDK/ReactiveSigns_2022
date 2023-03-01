@@ -131,7 +131,6 @@ function shadowFollow() {
         // show typo if tyle has been activated one time
         GridArray[i].displayColor = !GridArray[i].colorState;
       } 
-
     }
   }
 }
